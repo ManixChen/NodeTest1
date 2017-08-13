@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Promise</title>
+    <style>
+        .circle{
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+        }
+        .circle1{
+            background: red;
+        }
+        .circle2{
+            background: yellow;
+        }
+        .circle3{
+            background: green;
+        }
+    </style>
+    <script src="node_modules/bluebird/js/browser/bluebird.js"></script>
+</head>
+<body>
+<div class="circle circle1" style="margin-left: 50px"></div>
+<div class="circle circle2" style="margin-left: 50px"></div>
+<div class="circle circle3" style="margin-left: 50px"></div>
+
+<script>
+    var circle1=document.querySelector('.circle1');
+    var circle2=document.querySelector('.circle2');
+    var circle3=document.querySelector('.circle3');
+
+    function animation(circle, distance, cb) {
+        setTimeout(function () {
+            var marginLeft=parseInt(circle.style.marginLeft,10);
+            if(marginLeft===distance){
+                cb&&cb()
+            }else {
+                if(marginLeft<distance){
+                    marginLeft++
+                }else{
+                    marginLeft--
+                }
+                circle.style.marginLeft=marginLeft+'px'
+                animation(circle,distance,cb)
+            }
+
+        },13)
+    }
+//    animation(circle1,100,function () {
+//        animation(circle2,150,function () {
+//            animation(circle3,200,function () {
+//                animation(circle3,150,function () {
+//                    animation(circle2,150,function () {
+//                        animation(circle1,150,function () {
+//
+//                        })
+//                    })
+//                })
+//            })
+//        })
+//    })
+    var Promise=window.Promise;
+    function promiseAnimate(circle, distance) {
+        return new Promise(function (resolve, reject) {
+            function _animation() {
+                setTimeout(function () {
+                    var marginLeft=parseInt(circle.style.marginLeft,10);
+                    if(marginLeft===distance){
+                       resolve()
+                    }else {
+                        if(marginLeft<distance){
+                            marginLeft++
+                        }else{
+                            marginLeft--
+                        }
+                        circle.style.marginLeft=marginLeft+'px'
+                        _animation()
+                    }
+
+                },13)
+            }
+            _animation()
+        });
+    }
+
+    promiseAnimate(circle1,100)
+        .then(function () {
+            return   promiseAnimate(circle2,200)
+         })
+        .then(function () {
+            return   promiseAnimate(circle3,300)
+         })
+        .then(function () {
+            return   promiseAnimate(circle3,150)
+         })
+        .then(function () {
+            return   promiseAnimate(circle2,150)
+         })
+        .then(function () {
+            return   promiseAnimate(circle1,150)
+         })
+</script>
+</body>
+</html>
